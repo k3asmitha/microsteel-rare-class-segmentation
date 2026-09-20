@@ -1,0 +1,64 @@
+# =========================
+# MicroSteel project
+# =========================
+
+# Dataset - DO NOT COMMIT
+microsteel_dataset/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs / temporary files
+# =========================
+*.log
+*.tmp
+*.temp
+
+# =========================
+# Model files
+# =========================
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# =========================
+# Experiment outputs
+# =========================
+runs/
+wandb/
+mlruns/
+checkpoints/
+
+# =========================
+# Environment / secrets
+# =========================
+.env

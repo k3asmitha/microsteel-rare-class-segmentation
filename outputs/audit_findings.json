@@ -1,0 +1,924 @@
+{
+  "run_timestamp": "2026-09-20T06:44:12.350086Z",
+  "a01_inventory_audit": {
+    "check": "inventory_audit",
+    "question": "Can folder name be trusted as processing type?",
+    "folder_trustworthy": false,
+    "per_folder_type_breakdown": {
+      "images_class1": {
+        "I": 29
+      },
+      "images_class2": {
+        "II": 15,
+        "III": 10
+      },
+      "images_class3": {
+        "III": 25
+      }
+    },
+    "mismatch_count": 10,
+    "mismatches_sample": [
+      {
+        "stem": "Class_III_C26F2x10000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C27F2x10000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C27F2x15000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C28F2x10000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C28F2x10000_2",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C28F2x15000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C39F2x10000_2",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C39F2x100001",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C39F3x10000",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      },
+      {
+        "stem": "Class_III_C39F3x10000_2",
+        "folder": "images_class2",
+        "folder_implies_type": "II",
+        "true_type_from_filename": "III"
+      }
+    ],
+    "conclusion": "Folder names are UNRELIABLE. Downstream code must parse true type from the filename prefix, never from the containing folder."
+  },
+  "a02_pairing_audit": {
+    "check": "pairing_audit",
+    "question": "Does every label have a matching image and vice versa?",
+    "total_label_files": 82,
+    "total_image_files": 79,
+    "usable_pairs": 79,
+    "labels_without_image_count": 3,
+    "labels_without_image": [
+      {
+        "stem": "Class_III_C104F2x10000_6",
+        "true_type": "III"
+      },
+      {
+        "stem": "Class_II_C28F3x10000",
+        "true_type": "II"
+      },
+      {
+        "stem": "Class_II_C30F3x10000_2",
+        "true_type": "II"
+      }
+    ],
+    "images_without_label_count": 0,
+    "images_without_label": [],
+    "duplicate_stems_across_folders": [
+      [
+        "Class_I_C158F1x20000_2",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x20000_2.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x20000_2.jpg"
+      ],
+      [
+        "Class_I_C14F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C14F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C14F1x20000.jpg"
+      ],
+      [
+        "Class_I_C26F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C26F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C26F1x15000.jpg"
+      ],
+      [
+        "Class_I_C27F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C27F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C27F1x15000.jpg"
+      ],
+      [
+        "Class_I_C27F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C27F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C27F1x20000.jpg"
+      ],
+      [
+        "Class_I_C28F1x9500",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x9500.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x9500.jpg"
+      ],
+      [
+        "Class_I_C28F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x15000.jpg"
+      ],
+      [
+        "Class_I_C28F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C28F1x20000.jpg"
+      ],
+      [
+        "Class_I_C29F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C29F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C29F1x15000.jpg"
+      ],
+      [
+        "Class_I_C29F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C29F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C29F1x20000.jpg"
+      ],
+      [
+        "Class_I_C30F1x10000",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x10000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x10000.jpg"
+      ],
+      [
+        "Class_I_C30F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x15000.jpg"
+      ],
+      [
+        "Class_I_C30F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x20000.jpg"
+      ],
+      [
+        "Class_I_C30F1x25000",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x25000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C30F1x25000.jpg"
+      ],
+      [
+        "Class_I_C75F1x10000",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x10000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x10000.jpg"
+      ],
+      [
+        "Class_I_C75F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x15000.jpg"
+      ],
+      [
+        "Class_I_C75F1x25000",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x25000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C75F1x25000.jpg"
+      ],
+      [
+        "Class_I_C77F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C77F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C77F1x15000.jpg"
+      ],
+      [
+        "Class_I_C103F1x10000",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x10000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x10000.jpg"
+      ],
+      [
+        "Class_I_C103F1x10000_2",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x10000_2.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x10000_2.jpg"
+      ],
+      [
+        "Class_I_C103F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x15000.jpg"
+      ],
+      [
+        "Class_I_C103F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C103F1x20000.jpg"
+      ],
+      [
+        "Class_I_C104F1x10000",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x10000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x10000.jpg"
+      ],
+      [
+        "Class_I_C104F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x15000.jpg"
+      ],
+      [
+        "Class_I_C104F1x25000",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x25000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C104F1x25000.jpg"
+      ],
+      [
+        "Class_I_C157F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C157F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C157F1x15000.jpg"
+      ],
+      [
+        "Class_I_C157F1x15000_2",
+        "./microsteel_dataset\\images_class1\\Class_I_C157F1x15000_2.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C157F1x15000_2.jpg"
+      ],
+      [
+        "Class_I_C158F1x15000",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x15000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x15000.jpg"
+      ],
+      [
+        "Class_I_C158F1x20000",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x20000.jpg",
+        "./microsteel_dataset\\images_class1\\Class_I_C158F1x20000.jpg"
+      ],
+      [
+        "Class_II_C158F4x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000.jpg"
+      ],
+      [
+        "Class_II_C158F4x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000_2.jpg"
+      ],
+      [
+        "Class_II_C158F4x10000_3",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000_3.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F4x10000_3.jpg"
+      ],
+      [
+        "Class_III_C26F2x10000",
+        "./microsteel_dataset\\images_class2\\Class_III_C26F2x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C26F2x10000.jpg"
+      ],
+      [
+        "Class_III_C27F2x10000",
+        "./microsteel_dataset\\images_class2\\Class_III_C27F2x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C27F2x10000.jpg"
+      ],
+      [
+        "Class_III_C27F2x15000",
+        "./microsteel_dataset\\images_class2\\Class_III_C27F2x15000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C27F2x15000.jpg"
+      ],
+      [
+        "Class_III_C28F2x10000",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x10000.jpg"
+      ],
+      [
+        "Class_III_C28F2x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x10000_2.jpg"
+      ],
+      [
+        "Class_III_C28F2x15000",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x15000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C28F2x15000.jpg"
+      ],
+      [
+        "Class_III_C39F2x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F2x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F2x10000_2.jpg"
+      ],
+      [
+        "Class_III_C39F2x100001",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F2x100001.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F2x100001.jpg"
+      ],
+      [
+        "Class_III_C39F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F3x10000.jpg"
+      ],
+      [
+        "Class_III_C39F3x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F3x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_III_C39F3x10000_2.jpg"
+      ],
+      [
+        "Class_II_C14F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C14F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C14F3x10000.jpg"
+      ],
+      [
+        "Class_II_C26F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C26F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C26F3x10000.jpg"
+      ],
+      [
+        "Class_II_C27F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C27F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C27F3x10000.jpg"
+      ],
+      [
+        "Class_II_C29F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C29F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C29F3x10000.jpg"
+      ],
+      [
+        "Class_II_C30F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C30F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C30F3x10000.jpg"
+      ],
+      [
+        "Class_II_C35F3_x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_II_C35F3_x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C35F3_x10000_2.jpg"
+      ],
+      [
+        "Class_II_C104F3F4x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x10000.jpg"
+      ],
+      [
+        "Class_II_C104F3F4x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x10000_2.jpg"
+      ],
+      [
+        "Class_II_C104F3F4x100003",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x100003.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C104F3F4x100003.jpg"
+      ],
+      [
+        "Class_II_C158F3x5000",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x5000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x5000.jpg"
+      ],
+      [
+        "Class_II_C158F3x10000",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x10000.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x10000.jpg"
+      ],
+      [
+        "Class_II_C158F3x10000_2",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x10000_2.jpg",
+        "./microsteel_dataset\\images_class2\\Class_II_C158F3x10000_2.jpg"
+      ],
+      [
+        "Class_III_C103F2x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_3.jpg"
+      ],
+      [
+        "Class_III_C103F2x10000_4",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_4.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_4.jpg"
+      ],
+      [
+        "Class_III_C103F2x10000_5",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_5.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F2x10000_5.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_3.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000_4",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_4.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_4.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000_5",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_5.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_5.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000_6",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_6.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_6.jpg"
+      ],
+      [
+        "Class_III_C103F3x10000_7",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_7.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C103F3x10000_7.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000_2",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_2.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_2.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_3.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000_4",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_4.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_4.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000_5",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_5.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_5.jpg"
+      ],
+      [
+        "Class_III_C104F2x10000_7",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_7.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C104F2x10000_7.jpg"
+      ],
+      [
+        "Class_III_C157F2x10000",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000.jpg"
+      ],
+      [
+        "Class_III_C157F2x10000_2",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000_2.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000_2.jpg"
+      ],
+      [
+        "Class_III_C157F2x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F2x10000_3.jpg"
+      ],
+      [
+        "Class_III_C157F3x10000_2",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_2.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_2.jpg"
+      ],
+      [
+        "Class_III_C157F3x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_3.jpg"
+      ],
+      [
+        "Class_III_C157F3x10000_4",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_4.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10000_4.jpg"
+      ],
+      [
+        "Class_III_C157F3x10001",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10001.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C157F3x10001.jpg"
+      ],
+      [
+        "Class_III_C158F2x10000",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000.jpg"
+      ],
+      [
+        "Class_III_C158F2x10000_2",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000_2.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000_2.jpg"
+      ],
+      [
+        "Class_III_C158F2x10000_3",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000_3.jpg",
+        "./microsteel_dataset\\images_class3\\Class_III_C158F2x10000_3.jpg"
+      ]
+    ],
+    "conclusion": "79 usable image-label pairs found (out of 82 labels). 3 label(s) have NO source image and must be excluded from training -- they cannot be used no matter what the split files say."
+  },
+  "a03_geometry_audit": {
+    "check": "geometry_audit",
+    "question": "Do image/label dims match, is resolution constant, are all images grayscale?",
+    "size_diff_patterns": {
+      "w_diff=0,h_diff=65": 79
+    },
+    "constant_crop_offset": true,
+    "crop_offset_px": [
+      0,
+      65
+    ],
+    "resolution_distribution": {
+      "(1280, 1024)": 78,
+      "(960, 768)": 1
+    },
+    "resolution_is_constant": false,
+    "color_mode_distribution": {
+      "L": 74,
+      "RGB": 5
+    },
+    "rgb_images_with_identical_channels": 5,
+    "rgb_images_with_differing_channels": 0,
+    "evidence_files": [
+      "removed_bottom_strip.png",
+      "crop_alignment_overlay.png"
+    ],
+    "conclusion": "Crop rule is CONSTANT: every image is exactly 65px taller than its label (width unchanged). Rule: crop each image to its label's own height -- this is relative, not a fixed target resolution, since resolution varies across the dataset. Visual overlay confirms spatial alignment is correct. All RGB-mode images (5) have identical R=G=B channels -- safe to treat as grayscale with no information loss."
+  },
+  "a04_codebook_audit": {
+    "check": "codebook_audit",
+    "question": "What phase does each integer code represent, and is it consistent?",
+    "codebook_is_consistent": true,
+    "decoded_codebook": {
+      "4": "Fe2B",
+      "3": "FeTiB",
+      "0": "Alpha",
+      "1": "TiB2",
+      "2": "TiN"
+    },
+    "decode_evidence": {
+      "4": {
+        "presence_signature": [
+          "III"
+        ],
+        "global_pct": 10.5443,
+        "matched_by": "unique presence signature"
+      },
+      "3": {
+        "presence_signature": [
+          "I"
+        ],
+        "global_pct": 9.5738,
+        "matched_by": "unique presence signature"
+      },
+      "0": {
+        "presence_signature": [
+          "I",
+          "II",
+          "III"
+        ],
+        "global_pct": 73.9643,
+        "matched_by": "closest pixel-pct match among ambiguous candidates ['Alpha', 'TiB2', 'TiN'] (expected Alpha=74.0%, observed 73.9643%)"
+      },
+      "1": {
+        "presence_signature": [
+          "I",
+          "II",
+          "III"
+        ],
+        "global_pct": 5.746,
+        "matched_by": "closest pixel-pct match among ambiguous candidates ['TiB2', 'TiN'] (expected TiB2=6.0%, observed 5.7460%)"
+      },
+      "2": {
+        "presence_signature": [
+          "I",
+          "II",
+          "III"
+        ],
+        "global_pct": 0.1716,
+        "matched_by": "unique presence signature"
+      }
+    },
+    "global_pixel_pct_by_code": {
+      "0": 73.9643,
+      "1": 5.746,
+      "2": 0.1716,
+      "4": 10.5443,
+      "3": 9.5738
+    },
+    "per_type_pixel_pct_by_phase": {
+      "III": {
+        "Alpha": 71.3786,
+        "TiB2": 4.7286,
+        "TiN": 0.2284,
+        "Fe2B": 23.6644
+      },
+      "II": {
+        "Alpha": 82.5088,
+        "TiB2": 17.1468,
+        "TiN": 0.3444
+      },
+      "I": {
+        "Alpha": 72.6449,
+        "FeTiB": 26.3406,
+        "TiB2": 1.0034,
+        "TiN": 0.0112
+      }
+    },
+    "rare_class_decoded_id": 2,
+    "conclusion": "Integer<->RGB mapping is 100% consistent across all 79 usable images (zero exceptions). Decoded mapping: {4: 'Fe2B', 3: 'FeTiB', 0: 'Alpha', 1: 'TiB2', 2: 'TiN'}. Rare class 'TiN' decoded as integer code 2."
+  },
+  "a05_split_audit": {
+    "check": "split_audit",
+    "question": "Are split files internally consistent, typo-free, and TiN-stratified?",
+    "aggregate_vs_per_class_consistency": {
+      "train": {
+        "aggregate_count": 56,
+        "per_class_union_count": 56,
+        "matches": true,
+        "in_agg_not_in_union": [],
+        "in_union_not_in_agg": []
+      },
+      "val": {
+        "aggregate_count": 12,
+        "per_class_union_count": 12,
+        "matches": true,
+        "in_agg_not_in_union": [],
+        "in_union_not_in_agg": []
+      },
+      "test": {
+        "aggregate_count": 14,
+        "per_class_union_count": 14,
+        "matches": true,
+        "in_agg_not_in_union": [],
+        "in_union_not_in_agg": []
+      }
+    },
+    "all_splits_internally_consistent": true,
+    "typo_entries_found": [
+      {
+        "split_group": "val",
+        "raw_entry": "Class_I_C103F1x20000.jpg.png",
+        "normalized_to": "Class_I_C103F1x20000"
+      },
+      {
+        "split_group": "val",
+        "raw_entry": "Class_I_C157F1x15000.jpg.png",
+        "normalized_to": "Class_I_C157F1x15000"
+      },
+      {
+        "split_group": "val",
+        "raw_entry": "Class_I_C26F1x15000.jpg.png",
+        "normalized_to": "Class_I_C26F1x15000"
+      },
+      {
+        "split_group": "val",
+        "raw_entry": "Class_I_C28F1x20000.jpg.png",
+        "normalized_to": "Class_I_C28F1x20000"
+      }
+    ],
+    "tin_stratification_per_split": {
+      "train": {
+        "n_usable_images": 53,
+        "n_dropped_no_image": 3,
+        "dropped_stems": [
+          "Class_II_C28F3x10000",
+          "Class_II_C30F3x10000_2",
+          "Class_III_C104F2x10000_6"
+        ],
+        "n_images_containing_tin": 36,
+        "tin_pixel_pct": 0.144,
+        "per_type_image_count": {
+          "I": 20,
+          "II": 9,
+          "III": 24
+        }
+      },
+      "val": {
+        "n_usable_images": 12,
+        "n_dropped_no_image": 0,
+        "dropped_stems": [],
+        "n_images_containing_tin": 9,
+        "tin_pixel_pct": 0.2241,
+        "per_type_image_count": {
+          "I": 4,
+          "II": 3,
+          "III": 5
+        }
+      },
+      "test": {
+        "n_usable_images": 14,
+        "n_dropped_no_image": 0,
+        "dropped_stems": [],
+        "n_images_containing_tin": 11,
+        "tin_pixel_pct": 0.2303,
+        "per_type_image_count": {
+          "I": 5,
+          "II": 3,
+          "III": 6
+        }
+      }
+    },
+    "conclusion": "Split files are internally consistent. 4 typo'd entries found (e.g. double extensions) -- split parsing MUST normalize extensions, not string-match literally. TiN pixel share across splits: train=0.144%, val=0.2241%, test=0.2303%. Reasonably balanced -- official splits are usable as-is (after excluding orphan stems with no image)."
+  },
+  "build_manifest": {
+    "check": "build_manifest",
+    "usable_pairs": 79,
+    "excluded_count": 3,
+    "excluded": [
+      {
+        "stem": "Class_III_C104F2x10000_6",
+        "true_type": "III",
+        "reason": "no_matching_image_file"
+      },
+      {
+        "stem": "Class_II_C28F3x10000",
+        "true_type": "II",
+        "reason": "no_matching_image_file"
+      },
+      {
+        "stem": "Class_II_C30F3x10000_2",
+        "true_type": "II",
+        "reason": "no_matching_image_file"
+      }
+    ],
+    "manifest_path": "./outputs\\manifest.csv",
+    "excluded_path": "./outputs\\excluded_labels.csv",
+    "codebook_path": "./outputs\\class_codebook.json"
+  },
+  "validate_manifest": {
+    "check": "validate_manifest",
+    "n_rows_checked": 79,
+    "passed": true,
+    "failures": [],
+    "warnings": [
+      "[WARN] Type II: manifest has 15 usable images, paper states 17. This is EXPECTED if orphan labels were excluded -- verify against excluded_labels.csv, don't just suppress this warning.",
+      "[WARN] Type III: manifest has 35 usable images, paper states 36. This is EXPECTED if orphan labels were excluded -- verify against excluded_labels.csv, don't just suppress this warning."
+    ],
+    "per_type_counts": {
+      "III": 35,
+      "II": 15,
+      "I": 29
+    },
+    "split_counts": {
+      "train": 53,
+      "val": 12,
+      "test": 14
+    },
+    "conclusion": "VALIDATION PASSED: all 79 rows satisfy every invariant (pixel accounting, class legality per type, crop consistency, split validity)."
+  },
+  "tin_speck_analysis": {
+    "check": "tin_speck_analysis",
+    "question": "What patch size / stride should the shared pipeline use?",
+    "images_with_tin": 56,
+    "total_images": 79,
+    "total_specks_found": 2404,
+    "global_area_percentiles_px": {
+      "0": 1.0,
+      "10": 16.0,
+      "50": 50.0,
+      "90": 147.0,
+      "95": 189.0,
+      "99": 277.97,
+      "100": 844.0
+    },
+    "global_maxdim_percentiles_px": {
+      "0": 1.0,
+      "10": 5.0,
+      "50": 9.0,
+      "90": 16.0,
+      "95": 18.0,
+      "99": 23.0,
+      "100": 39.0
+    },
+    "per_type_area_percentiles_px": {
+      "III": {
+        "0": 1.0,
+        "10": 18.0,
+        "50": 57.0,
+        "90": 152.0,
+        "95": 201.0,
+        "99": 298.02,
+        "100": 844.0
+      },
+      "II": {
+        "0": 1.0,
+        "10": 12.5,
+        "50": 45.0,
+        "90": 136.0,
+        "95": 174.0,
+        "99": 256.75,
+        "100": 375.0
+      },
+      "I": {
+        "0": 1.0,
+        "10": 15.4,
+        "50": 46.0,
+        "90": 125.8,
+        "95": 206.4,
+        "99": 238.14,
+        "100": 240.0
+      }
+    },
+    "per_type_maxdim_percentiles_px": {
+      "III": {
+        "0": 1.0,
+        "10": 5.0,
+        "50": 10.0,
+        "90": 16.0,
+        "95": 18.0,
+        "99": 22.86,
+        "100": 39.0
+      },
+      "II": {
+        "0": 1.0,
+        "10": 4.0,
+        "50": 8.0,
+        "90": 16.0,
+        "95": 18.0,
+        "99": 23.0,
+        "100": 29.0
+      },
+      "I": {
+        "0": 1.0,
+        "10": 5.0,
+        "50": 9.0,
+        "90": 16.6,
+        "95": 18.8,
+        "99": 23.66,
+        "100": 28.0
+      }
+    },
+    "largest_specks_maxdim": [
+      39,
+      37,
+      37,
+      31,
+      30,
+      29,
+      28,
+      28,
+      28,
+      28
+    ],
+    "fragmentation_simulation": [
+      {
+        "patch_size": 128,
+        "stride": 128,
+        "overlap_pct": 0.0,
+        "total_patches_full_dataset": 4448,
+        "avg_patches_per_image": 56.3,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 230,
+        "pct_specks_fully_intact": 90.43
+      },
+      {
+        "patch_size": 128,
+        "stride": 64,
+        "overlap_pct": 50.0,
+        "total_patches_full_dataset": 14770,
+        "avg_patches_per_image": 187.0,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 0,
+        "pct_specks_fully_intact": 100.0
+      },
+      {
+        "patch_size": 256,
+        "stride": 256,
+        "overlap_pct": 0.0,
+        "total_patches_full_dataset": 1112,
+        "avg_patches_per_image": 14.1,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 102,
+        "pct_specks_fully_intact": 95.76
+      },
+      {
+        "patch_size": 256,
+        "stride": 128,
+        "overlap_pct": 50.0,
+        "total_patches_full_dataset": 3500,
+        "avg_patches_per_image": 44.3,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 0,
+        "pct_specks_fully_intact": 100.0
+      },
+      {
+        "patch_size": 512,
+        "stride": 512,
+        "overlap_pct": 0.0,
+        "total_patches_full_dataset": 334,
+        "avg_patches_per_image": 4.2,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 12,
+        "pct_specks_fully_intact": 99.5
+      },
+      {
+        "patch_size": 512,
+        "stride": 256,
+        "overlap_pct": 50.0,
+        "total_patches_full_dataset": 666,
+        "avg_patches_per_image": 8.4,
+        "total_tin_specks": 2404,
+        "specks_split_across_boundary": 0,
+        "pct_specks_fully_intact": 100.0
+      }
+    ],
+    "recommendation": {
+      "patch_size": 256,
+      "stride": 128,
+      "overlap_pct": 50.0,
+      "total_patches_full_dataset": 3500,
+      "avg_patches_per_image": 44.3,
+      "total_tin_specks": 2404,
+      "specks_split_across_boundary": 0,
+      "pct_specks_fully_intact": 100.0
+    },
+    "conclusion": "TiN specks are tiny (median max-dim 9.0px, p99 23.0px, largest ever seen 39px). Speck SIZE was never the constraint -- boundary PLACEMENT was: non-overlapping tiling splits several percent of specks regardless of patch size. Recommendation: patch_size=256, stride=128 (50.0% overlap) achieves 100.0% speck containment at 44.3 patches/image on average -- large patch sizes with fewer patches/image were rejected because they leave too little sub-image granularity for patch-level oversampling to mean anything."
+  }
+}

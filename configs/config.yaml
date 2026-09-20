@@ -1,0 +1,57 @@
+# MicroSteel pipeline config
+# Every script in src/ reads paths and parameters from here.
+# Nothing should be hardcoded in individual scripts that also appears here.
+
+paths:
+  data_root: "./microsteel_dataset"   # contains images_class*/, labels/, splits/
+  evidence_dir: "./evidence"
+  output_dir: "./outputs"
+
+# Rare class under study
+rare_class:
+  id: 2
+  name: "TiN"
+
+# Known per-type class membership, per the project's own dataset description.
+# The codebook audit VERIFIES this against real pixel data rather than assuming it;
+# this entry is what's checked against, not what's blindly trusted.
+expected_type_class_membership:
+  I:   ["Alpha", "TiB2", "TiN", "FeTiB"]
+  II:  ["Alpha", "TiB2", "TiN"]
+  III: ["Alpha", "TiB2", "TiN", "Fe2B"]
+
+# Expected global pixel share per phase, per the project doc / paper.
+# Used ONLY to disambiguate which integer code maps to which phase name when
+# multiple candidate codes share the same per-type presence pattern (e.g.
+# Alpha/TiB2/TiN all appear in all three types, so presence pattern alone
+# can't tell them apart -- percentage rank order can).
+expected_pixel_pct:
+  Alpha: 74.0
+  TiB2: 6.0
+  FeTiB: 9.0
+  Fe2B: 10.0
+  TiN: 0.17
+
+# Expected raw counts per the paper / project doc, used only as a comparison
+# baseline in the audit report -- NOT as ground truth to force-fit data into.
+expected_counts_per_paper:
+  I: 29
+  II: 17
+  III: 36
+  total_labels: 82
+
+# Patch tiling parameters -- DECIDED via measured TiN speck-size analysis,
+# see outputs/AUDIT_REPORT.md section "Patch size decision" for the evidence.
+patching:
+  patch_size: 256
+  stride: 128   # 50% overlap
+
+# Candidate configs the speck-size analysis will benchmark before the
+# patch_size/stride above is treated as final.
+patching_candidates:
+  - [128, 128]
+  - [128, 64]
+  - [256, 256]
+  - [256, 128]
+  - [512, 512]
+  - [512, 256]
