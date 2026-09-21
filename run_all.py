@@ -32,6 +32,10 @@ from src.audit import a04_codebook_audit, a05_split_audit
 from src.manifest.build_manifest import build_manifest
 from src.manifest.validate_manifest import validate as validate_manifest
 from src.analysis.tin_speck_analysis import run as run_speck_analysis
+from src.patching.patch_index_builder import build_patch_index
+from src.patching.validate_patch_index import validate as validate_patch_index
+from src.patching.sampler import run as run_sampler
+from src.patching.verify_dataset import run as run_verify_dataset
 
 
 def section(title):
@@ -100,8 +104,47 @@ def main():
     speck_result = run_speck_analysis(cfg)
     all_findings["tin_speck_analysis"] = speck_result
     print(speck_result["conclusion"])
+    # Write intermediate results NOW -- validate_patch_index needs this file
+    # on disk to cross-check against the fragmentation simulation, and it
+    # would otherwise not exist yet on a clean run (this file is normally
+    # only finalized at the end of main()).
+    _write_outputs(cfg, all_findings)
+
+    section("RUNNING: build_patch_index")
+    try:
+        patch_rows, patch_summary = build_patch_index(cfg)
+        all_findings["build_patch_index"] = patch_summary
+        print(patch_summary["conclusion"])
+    except Exception as e:
+        all_findings["build_patch_index"] = {"error": str(e), "traceback": traceback.format_exc()}
+        print(f"PATCH INDEX BUILD ERRORED: {e}")
+        _write_outputs(cfg, all_findings)
+        return 1
+
+    section("RUNNING: validate_patch_index")
+    patch_val_result = validate_patch_index(cfg)
+    all_findings["validate_patch_index"] = patch_val_result
+    print(patch_val_result["conclusion"])
+    if not patch_val_result["passed"]:
+        hard_failure = True
+
+    section("RUNNING: sampler")
+    sampler_result = run_sampler(cfg)
+    all_findings["sampler"] = sampler_result
+    print(sampler_result["conclusion"])
+    if not sampler_result.get("passed", True):
+        hard_failure = True
+
+    section("RUNNING: verify_dataset")
+    verify_result = run_verify_dataset(cfg)
+    all_findings["verify_dataset"] = verify_result
+    print(verify_result["conclusion"])
+    if not verify_result["passed"]:
+        hard_failure = True
 
     _write_outputs(cfg, all_findings)
+    if hard_failure:
+        return 1
     section("DONE")
     print("All stages passed. See outputs/AUDIT_REPORT.md for the full report.")
     return 0
@@ -110,12 +153,12 @@ def main():
 def _write_outputs(cfg, all_findings):
     out_dir = cfg["paths"]["output_dir"]
     json_path = os.path.join(out_dir, "audit_findings.json")
-    with open(json_path, "w") as f:
+    with open(json_path, "w",encoding="utf-8") as f:
         json.dump(all_findings, f, indent=2, default=str)
 
     report = _render_report(all_findings)
     report_path = os.path.join(out_dir, "AUDIT_REPORT.md")
-    with open(report_path, "w") as f:
+    with open(report_path, "w",encoding="utf-8") as f:
         f.write(report)
 
     print(f"\nWrote {json_path}")
@@ -181,6 +224,37 @@ def _render_report(f: dict) -> str:
         if rec:
             lines.append(f"\n**Final recommendation:** patch_size={rec['patch_size']}, "
                           f"stride={rec['stride']} ({rec['overlap_pct']}% overlap)")
+
+    if "build_patch_index" in f:
+        r = f["build_patch_index"]
+        lines.append("\n## 9. Patch Index Build")
+        if "error" in r:
+            lines.append(f"\n**STAGE ERRORED:** `{r['error']}`")
+        else:
+            lines.append(f"\n**Conclusion:** {r.get('conclusion')}")
+
+    if "validate_patch_index" in f:
+        r = f["validate_patch_index"]
+        lines.append("\n## 10. Patch Index Validation (incl. cross-check vs. speck analysis)")
+        lines.append(f"\n**Result:** {r.get('conclusion')}")
+        cc = r.get("cross_check_vs_fragmentation_simulation")
+        if cc:
+            lines.append(f"\nCross-check: fragmentation simulation predicted "
+                          f"**{cc['expected_from_simulation']}** total patches; "
+                          f"actual patch index built **{cc['actual_from_patch_index']}** — "
+                          f"{'MATCH' if cc['match'] else 'MISMATCH (see failures)'}.")
+
+    if "sampler" in f:
+        r = f["sampler"]
+        lines.append("\n## 11. Weighted Sampler (TiN oversampling)")
+        lines.append(f"\n**Conclusion:** {r.get('conclusion')}")
+        if r.get("warning"):
+            lines.append(f"\n> ⚠️ {r['warning']}")
+
+    if "verify_dataset" in f:
+        r = f["verify_dataset"]
+        lines.append("\n## 12. Dataset Extraction & Augmentation Verification")
+        lines.append(f"\n**Result:** {r.get('conclusion')}")
 
     lines.append("\n---\n*End of generated report.*")
     return "\n".join(lines)

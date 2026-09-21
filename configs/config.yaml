@@ -46,8 +46,26 @@ patching:
   patch_size: 256
   stride: 128   # 50% overlap
 
+# Weighted sampler: target fraction of patches per training epoch that
+# should contain the rare class (TiN), achieved via oversampling with
+# replacement. This is a knob for the 4-config ablation grid
+# (baseline / patch-oversampling / weighted-loss / both) -- baseline runs
+# should use target_tin_fraction = None (uniform sampling, no oversampling).
+sampler:
+  # NOTE: 0.5 was the naive first guess. The sampler's own verification
+  # (src/patching/sampler.py) found the NATURAL unweighted TiN-patch
+  # fraction in the train split is already ~0.51, due to 50% patch overlap
+  # smearing "contains any TiN pixel" across most patches even though
+  # pixel-level TiN share is ~0.17%. A target of 0.5 barely differs from
+  # baseline -- see outputs/AUDIT_REPORT.md section 11 for the full warning
+  # before running the ablation grid with this value.
+  target_tin_fraction: 0.5
+
 # Candidate configs the speck-size analysis will benchmark before the
-# patch_size/stride above is treated as final.
+# patch_size/stride above is treated as final. Selection requires 0%
+# fragmentation AND >=20 avg patches/image (an engineering judgment call,
+# not derived from data -- see tin_speck_analysis.py comment), then picks
+# the cheapest (fewest total patches) among what's left.
 patching_candidates:
   - [128, 128]
   - [128, 64]

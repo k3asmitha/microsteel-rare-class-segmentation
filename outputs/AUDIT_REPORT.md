@@ -1,34 +1,34 @@
-# MicroSteel Pipeline ó Audit Report
+# MicroSteel Pipeline ‚Äî Audit Report
 
-Generated: 2026-09-20T06:44:12.350086Z
+Generated: 2026-09-21T16:31:21.605443Z
 
 This report is generated directly from `outputs/audit_findings.json`, which is itself the return value of each stage in `run_all.py` run against the raw dataset. Nothing below is hand-typed after the fact.
 
-## 1. Inventory Audit ó can folder names be trusted?
+## 1. Inventory Audit ‚Äî can folder names be trusted?
 
 **Question:** Can folder name be trusted as processing type?
 
 **Conclusion:** Folder names are UNRELIABLE. Downstream code must parse true type from the filename prefix, never from the containing folder.
 
-## 2. Pairing Audit ó does every label have an image?
+## 2. Pairing Audit ‚Äî does every label have an image?
 
 **Question:** Does every label have a matching image and vice versa?
 
 **Conclusion:** 79 usable image-label pairs found (out of 82 labels). 3 label(s) have NO source image and must be excluded from training -- they cannot be used no matter what the split files say.
 
-## 3. Geometry Audit ó crop offset, resolution, color mode
+## 3. Geometry Audit ‚Äî crop offset, resolution, color mode
 
 **Question:** Do image/label dims match, is resolution constant, are all images grayscale?
 
 **Conclusion:** Crop rule is CONSTANT: every image is exactly 65px taller than its label (width unchanged). Rule: crop each image to its label's own height -- this is relative, not a fixed target resolution, since resolution varies across the dataset. Visual overlay confirms spatial alignment is correct. All RGB-mode images (5) have identical R=G=B channels -- safe to treat as grayscale with no information loss.
 
-## 4. Codebook Audit ó decoding integer mask values
+## 4. Codebook Audit ‚Äî decoding integer mask values
 
 **Question:** What phase does each integer code represent, and is it consistent?
 
 **Conclusion:** Integer<->RGB mapping is 100% consistent across all 79 usable images (zero exceptions). Decoded mapping: {4: 'Fe2B', 3: 'FeTiB', 0: 'Alpha', 1: 'TiB2', 2: 'TiN'}. Rare class 'TiN' decoded as integer code 2.
 
-## 5. Split Audit ó split file integrity & TiN stratification
+## 5. Split Audit ‚Äî split file integrity & TiN stratification
 
 **Question:** Are split files internally consistent, typo-free, and TiN-stratified?
 
@@ -51,20 +51,40 @@ Warnings:
 
 ## 8. Patch Size Decision (TiN Speck Analysis)
 
-**Conclusion:** TiN specks are tiny (median max-dim 9.0px, p99 23.0px, largest ever seen 39px). Speck SIZE was never the constraint -- boundary PLACEMENT was: non-overlapping tiling splits several percent of specks regardless of patch size. Recommendation: patch_size=256, stride=128 (50.0% overlap) achieves 100.0% speck containment at 44.3 patches/image on average -- large patch sizes with fewer patches/image were rejected because they leave too little sub-image granularity for patch-level oversampling to mean anything.
+**Conclusion:** TiN specks are tiny (median max-dim 9.0px, p99 23.0px, largest ever seen 39px). Speck SIZE was never the constraint -- boundary PLACEMENT was: non-overlapping tiling splits several percent of specks regardless of patch size. Recommendation: patch_size=256, stride=128 (50.0% overlap) achieves 100.0% speck containment at 62.6 patches/image on average -- large patch sizes with fewer patches/image were rejected because they leave too little sub-image granularity for patch-level oversampling to mean anything.
 
 **Fragmentation simulation results:**
 
 | Patch | Stride | Overlap % | Total patches | % specks intact |
 |---|---|---|---|---|
-| 128 | 128 | 0.0 | 4448 | 90.43 |
-| 128 | 64 | 50.0 | 14770 | 100.0 |
-| 256 | 256 | 0.0 | 1112 | 95.76 |
-| 256 | 128 | 50.0 | 3500 | 100.0 |
-| 512 | 512 | 0.0 | 334 | 99.5 |
-| 512 | 256 | 50.0 | 666 | 100.0 |
+| 128 | 128 | 0.0 | 6288 | 90.43 |
+| 128 | 64 | 50.0 | 20888 | 100.0 |
+| 256 | 256 | 0.0 | 1572 | 95.76 |
+| 256 | 128 | 50.0 | 4949 | 100.0 |
+| 512 | 512 | 0.0 | 472 | 99.5 |
+| 512 | 256 | 50.0 | 942 | 100.0 |
 
 **Final recommendation:** patch_size=256, stride=128 (50.0% overlap)
+
+## 9. Patch Index Build
+
+**Conclusion:** Built 4949 patches from 79 images (256px, stride 128). Per-split: {'train': 3311, 'val': 756, 'test': 882}, of which TiN-containing: {'train': 1686, 'val': 428, 'test': 481}.
+
+## 10. Patch Index Validation (incl. cross-check vs. speck analysis)
+
+**Result:** VALIDATION PASSED: 4949 patches checked, all structurally consistent with manifest. Patch count also MATCHES the fragmentation simulation's independent prediction (4949) -- the two separately-computed grids agree.
+
+Cross-check: fragmentation simulation predicted **4949** total patches; actual patch index built **4949** ‚Äî MATCH.
+
+## 11. Weighted Sampler (TiN oversampling)
+
+**Conclusion:** Natural TiN-patch fraction in train split is 0.5092 (1686/3311). With target_tin_fraction=0.5, weighted sampling achieves 0.4997 over 50,000 simulated draws (target met: True). This confirms the weight-derivation formula actually produces the intended oversampling ratio, not just algebraically.
+
+> ‚ö†Ô∏è WARNING: natural (unweighted) TiN-patch fraction in the train split is already 0.5092, close to the configured target_tin_fraction=0.5. This is a direct consequence of heavy patch overlap (50%) smearing 'contains any TiN pixel' across most of the patch population, even though pixel-level TiN share is only ~0.17%. A 'patch-oversampling' config at this target would barely differ from baseline uniform sampling -- the ablation would not actually test what it claims to. Consider either raising target_tin_fraction substantially (e.g. 0.8-0.9), or redefining oversampling by per-patch TiN PIXEL PERCENTAGE rather than binary presence, before running the 24-config grid.
+
+## 12. Dataset Extraction & Augmentation Verification
+
+**Result:** VERIFIED: extract_patch() output matches patch_index.csv's precomputed pixel counts exactly across 200 sampled patches (bit-for-bit, not just shape). Augmentation preserves label validity (class set and per-class pixel counts unchanged) across 50 sampled patches.
 
 ---
 *End of generated report.*

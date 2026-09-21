@@ -1,5 +1,5 @@
 {
-  "run_timestamp": "2026-09-20T06:44:12.350086Z",
+  "run_timestamp": "2026-09-21T16:31:21.605443Z",
   "a01_inventory_audit": {
     "check": "inventory_audit",
     "question": "Can folder name be trusted as processing type?",
@@ -852,8 +852,8 @@
         "patch_size": 128,
         "stride": 128,
         "overlap_pct": 0.0,
-        "total_patches_full_dataset": 4448,
-        "avg_patches_per_image": 56.3,
+        "total_patches_full_dataset": 6288,
+        "avg_patches_per_image": 79.6,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 230,
         "pct_specks_fully_intact": 90.43
@@ -862,8 +862,8 @@
         "patch_size": 128,
         "stride": 64,
         "overlap_pct": 50.0,
-        "total_patches_full_dataset": 14770,
-        "avg_patches_per_image": 187.0,
+        "total_patches_full_dataset": 20888,
+        "avg_patches_per_image": 264.4,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 0,
         "pct_specks_fully_intact": 100.0
@@ -872,8 +872,8 @@
         "patch_size": 256,
         "stride": 256,
         "overlap_pct": 0.0,
-        "total_patches_full_dataset": 1112,
-        "avg_patches_per_image": 14.1,
+        "total_patches_full_dataset": 1572,
+        "avg_patches_per_image": 19.9,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 102,
         "pct_specks_fully_intact": 95.76
@@ -882,8 +882,8 @@
         "patch_size": 256,
         "stride": 128,
         "overlap_pct": 50.0,
-        "total_patches_full_dataset": 3500,
-        "avg_patches_per_image": 44.3,
+        "total_patches_full_dataset": 4949,
+        "avg_patches_per_image": 62.6,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 0,
         "pct_specks_fully_intact": 100.0
@@ -892,8 +892,8 @@
         "patch_size": 512,
         "stride": 512,
         "overlap_pct": 0.0,
-        "total_patches_full_dataset": 334,
-        "avg_patches_per_image": 4.2,
+        "total_patches_full_dataset": 472,
+        "avg_patches_per_image": 6.0,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 12,
         "pct_specks_fully_intact": 99.5
@@ -902,8 +902,8 @@
         "patch_size": 512,
         "stride": 256,
         "overlap_pct": 50.0,
-        "total_patches_full_dataset": 666,
-        "avg_patches_per_image": 8.4,
+        "total_patches_full_dataset": 942,
+        "avg_patches_per_image": 11.9,
         "total_tin_specks": 2404,
         "specks_split_across_boundary": 0,
         "pct_specks_fully_intact": 100.0
@@ -913,12 +913,83 @@
       "patch_size": 256,
       "stride": 128,
       "overlap_pct": 50.0,
-      "total_patches_full_dataset": 3500,
-      "avg_patches_per_image": 44.3,
+      "total_patches_full_dataset": 4949,
+      "avg_patches_per_image": 62.6,
       "total_tin_specks": 2404,
       "specks_split_across_boundary": 0,
       "pct_specks_fully_intact": 100.0
     },
-    "conclusion": "TiN specks are tiny (median max-dim 9.0px, p99 23.0px, largest ever seen 39px). Speck SIZE was never the constraint -- boundary PLACEMENT was: non-overlapping tiling splits several percent of specks regardless of patch size. Recommendation: patch_size=256, stride=128 (50.0% overlap) achieves 100.0% speck containment at 44.3 patches/image on average -- large patch sizes with fewer patches/image were rejected because they leave too little sub-image granularity for patch-level oversampling to mean anything."
+    "conclusion": "TiN specks are tiny (median max-dim 9.0px, p99 23.0px, largest ever seen 39px). Speck SIZE was never the constraint -- boundary PLACEMENT was: non-overlapping tiling splits several percent of specks regardless of patch size. Recommendation: patch_size=256, stride=128 (50.0% overlap) achieves 100.0% speck containment at 62.6 patches/image on average -- large patch sizes with fewer patches/image were rejected because they leave too little sub-image granularity for patch-level oversampling to mean anything."
+  },
+  "build_patch_index": {
+    "check": "build_patch_index",
+    "patch_size": 256,
+    "stride": 128,
+    "total_patches": 4949,
+    "n_source_images": 79,
+    "avg_patches_per_image": 62.65,
+    "per_split_patch_counts": {
+      "train": 3311,
+      "val": 756,
+      "test": 882
+    },
+    "per_split_tin_patch_counts": {
+      "train": 1686,
+      "val": 428,
+      "test": 481
+    },
+    "patch_index_path": "./outputs\\patch_index.csv",
+    "conclusion": "Built 4949 patches from 79 images (256px, stride 128). Per-split: {'train': 3311, 'val': 756, 'test': 882}, of which TiN-containing: {'train': 1686, 'val': 428, 'test': 481}."
+  },
+  "validate_patch_index": {
+    "check": "validate_patch_index",
+    "n_patches_checked": 4949,
+    "n_source_images_covered": 79,
+    "n_source_images_in_manifest": 79,
+    "cross_check_vs_fragmentation_simulation": {
+      "expected_from_simulation": 4949,
+      "actual_from_patch_index": 4949,
+      "match": true
+    },
+    "passed": true,
+    "failures": [],
+    "n_failures_total": 0,
+    "warnings": [],
+    "conclusion": "VALIDATION PASSED: 4949 patches checked, all structurally consistent with manifest. Patch count also MATCHES the fragmentation simulation's independent prediction (4949) -- the two separately-computed grids agree."
+  },
+  "sampler": {
+    "check": "sampler",
+    "train_split_size": 3311,
+    "train_split_natural_tin_fraction": 0.5092,
+    "configured_target_tin_fraction": 0.5,
+    "oversampling_is_meaningful_vs_baseline": false,
+    "warning": "WARNING: natural (unweighted) TiN-patch fraction in the train split is already 0.5092, close to the configured target_tin_fraction=0.5. This is a direct consequence of heavy patch overlap (50%) smearing 'contains any TiN pixel' across most of the patch population, even though pixel-level TiN share is only ~0.17%. A 'patch-oversampling' config at this target would barely differ from baseline uniform sampling -- the ablation would not actually test what it claims to. Consider either raising target_tin_fraction substantially (e.g. 0.8-0.9), or redefining oversampling by per-patch TiN PIXEL PERCENTAGE rather than binary presence, before running the 24-config grid.",
+    "simulation_results": {
+      "uniform_baseline": {
+        "target_tin_fraction": null,
+        "natural_tin_fraction_in_train_split": 0.5092,
+        "simulated_achieved_tin_fraction": 0.5074,
+        "close_to_target": true,
+        "pct_unique_patches_sampled_in_50k_draws": 100.0
+      },
+      "target_0.5": {
+        "target_tin_fraction": 0.5,
+        "natural_tin_fraction_in_train_split": 0.5092,
+        "simulated_achieved_tin_fraction": 0.4997,
+        "close_to_target": true,
+        "pct_unique_patches_sampled_in_50k_draws": 100.0
+      }
+    },
+    "passed": true,
+    "conclusion": "Natural TiN-patch fraction in train split is 0.5092 (1686/3311). With target_tin_fraction=0.5, weighted sampling achieves 0.4997 over 50,000 simulated draws (target met: True). This confirms the weight-derivation formula actually produces the intended oversampling ratio, not just algebraically."
+  },
+  "verify_dataset": {
+    "check": "verify_dataset",
+    "n_patches_tested_for_extraction": 200,
+    "n_patches_tested_for_augmentation": 50,
+    "extraction_failures": [],
+    "augmentation_failures": [],
+    "passed": true,
+    "conclusion": "VERIFIED: extract_patch() output matches patch_index.csv's precomputed pixel counts exactly across 200 sampled patches (bit-for-bit, not just shape). Augmentation preserves label validity (class set and per-class pixel counts unchanged) across 50 sampled patches."
   }
 }

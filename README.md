@@ -12,7 +12,7 @@ microsteel_project/
 ├── configs/
 │   └── config.yaml          # ALL paths + parameters live here, nowhere else
 ├── src/
-│   ├── common.py            # shared utilities (type parsing, image mapping) — single implementation
+│   ├── common.py             # shared utilities (type parsing, image mapping) — single implementation
 │   ├── audit/
 │   │   ├── a01_inventory_audit.py   # can folder names be trusted?
 │   │   ├── a02_pairing_audit.py     # does every label have a matching image?
@@ -22,12 +22,20 @@ microsteel_project/
 │   ├── manifest/
 │   │   ├── build_manifest.py        # builds outputs/manifest.csv from audit results
 │   │   └── validate_manifest.py     # checks every row against invariants
-│   └── analysis/
-│       └── tin_speck_analysis.py    # measures TiN speck sizes, decides patch_size/stride
-├── run_all.py                # THE entrypoint — runs everything in order
+│   ├── analysis/
+│   │   └── tin_speck_analysis.py    # measures TiN speck sizes, decides patch_size/stride
+│   └── patching/
+│       ├── grid.py                  # ONE canonical patch-grid function (shared with analysis stage)
+│       ├── patch_index_builder.py   # builds outputs/patch_index.csv (per-patch stats)
+│       ├── validate_patch_index.py  # validates + cross-checks vs. fragmentation simulation
+│       ├── sampler.py               # TiN-oversampling weights + simulated verification
+│       ├── dataset.py               # patch pixel extraction (+ optional torch Dataset)
+│       ├── augmentation.py          # deterministic flip/rotate/brightness augmentations
+│       └── verify_dataset.py        # cross-checks extraction against patch_index, tests augmentation
+├── run_all.py                 # THE entrypoint — runs all 12 stages in order
 ├── requirements.txt
-├── evidence/                 # visual proof (crop alignment overlay, removed metadata strip)
-└── outputs/                  # generated — manifest.csv, AUDIT_REPORT.md, etc.
+├── evidence/                  # visual proof (crop alignment overlay, removed metadata strip)
+└── outputs/                   # generated — manifest.csv, patch_index.csv, AUDIT_REPORT.md, etc.
 ```
 
 ## How to run it
@@ -50,9 +58,25 @@ That's the only command you need. It runs, in order:
    silently wrong)
 3. `validate_manifest.py` (checks every row of the manifest just built)
 4. `tin_speck_analysis.py` (measures speck geometry, decides patch size)
+5. `patch_index_builder.py` (enumerates every patch position + per-class stats)
+6. `validate_patch_index.py` (checks every patch row, cross-checks total
+   count against stage 4's independent simulation)
+7. `sampler.py` (computes TiN-oversampling weights, verifies achieved
+   sampling distribution by actual simulated draws)
+8. `verify_dataset.py` (confirms real pixel extraction matches what stage 5
+   indexed, tests augmentation invariants)
 
 Exit code is `0` only if every hard check passes. Non-zero means something
-is broken and the manifest should not be trusted or used for training.
+is broken and the manifest/patch index should not be trusted or used for
+training.
+
+Standalone, any single patching-stage module can also be run directly:
+```bash
+python3 -m src.patching.patch_index_builder
+python3 -m src.patching.validate_patch_index
+python3 -m src.patching.sampler
+python3 -m src.patching.verify_dataset
+```
 
 ## How to verify it worked
 
@@ -131,3 +155,48 @@ weighted-sampler code that reads `outputs/manifest.csv` and produces
 training-ready patches using `patch_size=256, stride=128` from
 `configs/config.yaml`. That hasn't been built yet — this repo only
 establishes and verifies the *inputs* to it.
+
+## Bugs found and fixed WHILE building the patching stage (stages 8-12)
+
+Documented here because they're exactly the kind of thing that looks fine
+until you check the numbers, and they change conclusions stated earlier:
+
+1. **Patch-recommendation logic picked the wrong optimization target twice.**
+   First it minimized `patch_size` directly instead of total compute cost
+   (picked 128/64 over the cheaper, equally-effective 256/128). After fixing
+   that, a second run exposed that the ">=10 patches/image" granularity
+   floor was an arbitrary guess that let 512/256 sneak through as "cheapest"
+   — exactly the coarse-tiling outcome the floor was meant to prevent. Fixed
+   by raising the floor to >=20/image and labeling it explicitly as an
+   engineering judgment call, not a derived number.
+2. **`simulate_fragmentation()` silently returned 0 patches for any image
+   with zero TiN specks** (23 of 79 images), undercounting every "total
+   patches" figure in the recommendation table by ~30%. This didn't change
+   which config had 0% fragmentation, but it did affect the total-patch-count
+   comparison used to pick among zero-fragmentation candidates. Fixed, then
+   the whole table was regenerated and cross-checked against the real patch
+   indexer (see #3).
+3. **`validate_patch_index.py`'s cross-check against the fragmentation
+   simulation ran before `audit_findings.json` existed** on a clean run —
+   silently degrading to "can't compare" while the success message still
+   claimed "MATCHES." Fixed the write ordering in `run_all.py` and the
+   misleading message; the real cross-check (4949 == 4949, computed by two
+   independently-implemented code paths) is what's now in the report.
+4. **The sampler's own simulation found something that changes the
+   experiment**, not just a bug: with 50% patch overlap, ~51% of train-split
+   patches already contain at least one TiN pixel with *zero* oversampling.
+   A `target_tin_fraction=0.5` "oversampling" config would barely differ from
+   baseline uniform sampling — the ablation wouldn't test what it claims to.
+   See `outputs/AUDIT_REPORT.md` section 11 before running the 24-config
+   grid; either raise the target substantially or redefine oversampling by
+   per-patch TiN pixel percentage instead of binary presence.
+
+## What's left before B and C can start training
+
+- **Decide on the oversampling target** given finding #4 above — this
+  affects the "patch-oversampling" and "both" configs in the 4-config grid.
+- **Weighted loss (Tversky/focal)** — Person B's ownership, not built here.
+- **Model wrapper code** for DeepLabV3+ and Attention U-Net consuming
+  `MicroSteelPatchDataset` from `src/patching/dataset.py`.
+- **Eval module** (per-class IoU, Boundary F1, Hausdorff) — not yet built;
+  next logical piece once training loops exist to evaluate.

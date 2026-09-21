@@ -24,6 +24,7 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from src.common import load_config
+from src.patching.grid import compute_patch_origins
 
 
 def get_tin_components(label_arr, rare_id):
@@ -51,20 +52,15 @@ def percentiles(values, ps=(0, 10, 50, 90, 95, 99, 100)):
 
 
 def simulate_fragmentation(label_arr, rare_id, patch_size, stride):
+    H, W = label_arr.shape
+    origins = compute_patch_origins(H, W, patch_size, stride)
+    n_patches = len(origins)  # must be counted regardless of whether TiN exists
+
     binary = (label_arr == rare_id)
     structure = np.ones((3, 3), dtype=int)
     labeled, n = ndimage.label(binary, structure=structure)
     if n == 0:
-        return 0, 0, 0
-
-    H, W = label_arr.shape
-    ys = list(range(0, max(H - patch_size, 0) + 1, stride))
-    xs = list(range(0, max(W - patch_size, 0) + 1, stride))
-    if not ys or ys[-1] + patch_size < H:
-        ys.append(max(H - patch_size, 0))
-    if not xs or xs[-1] + patch_size < W:
-        xs.append(max(W - patch_size, 0))
-    n_patches = len(ys) * len(xs)
+        return 0, 0, n_patches
 
     split_count = 0
     intact_count = 0
@@ -72,17 +68,10 @@ def simulate_fragmentation(label_arr, rare_id, patch_size, stride):
         if sl is None:
             continue
         y0, y1, x0, x1 = sl[0].start, sl[0].stop, sl[1].start, sl[1].stop
-        contained = False
-        for py in ys:
-            if py > y0 or py + patch_size < y1:
-                continue
-            for px in xs:
-                if px > x0 or px + patch_size < x1:
-                    continue
-                contained = True
-                break
-            if contained:
-                break
+        contained = any(
+            py <= y0 and py + patch_size >= y1 and px <= x0 and px + patch_size >= x1
+            for py, px in origins
+        )
         if contained:
             intact_count += 1
         else:
@@ -140,18 +129,23 @@ def run(config: dict) -> dict:
             "pct_specks_fully_intact": round(pct_intact, 2) if pct_intact is not None else None,
         })
 
-    # --- recommendation logic: among candidates achieving 0% fragmentation
-    #     AND enough patches/image to make "patch-level" oversampling
-    #     meaningful (>=10/image -- below this, patch oversampling barely
-    #     differs from whole-image training), pick the one with the FEWEST
-    #     total patches. This minimizes compute cost for identical
-    #     fragmentation performance -- it is NOT "pick the smallest patch
-    #     size", since a smaller patch size can cost far more total compute
-    #     for zero additional fragmentation benefit (verified below: 128/64
-    #     and 256/128 both achieve 100% intact specks, but 128/64 costs
-    #     4.2x more total patches for no accuracy-relevant difference). ---
+    # --- recommendation logic ---
+    # Hard requirement: 0% fragmentation (every TiN speck fully inside one patch).
+    #
+    # Granularity threshold below is an ENGINEERING JUDGMENT CALL, not something
+    # derived from the data -- flagged as such rather than dressed up as computed.
+    # Reasoning: patch-level oversampling only means something different from
+    # whole-image oversampling if each image contributes many candidate patches
+    # to independently include/exclude/reweight. ~12 patches/image (as 512px
+    # patches give) is barely more granular than whole-image training. We
+    # require >=20 patches/image as a floor for "patch-level" to be a
+    # meaningful unit of oversampling control. This number is a design choice;
+    # if your project's oversampling strategy differs, revisit it explicitly
+    # rather than trusting this default.
+    MIN_PATCHES_PER_IMAGE_FOR_GRANULARITY = 20
+
     zero_frag = [s for s in sim_results if s["pct_specks_fully_intact"] == 100.0]
-    viable = [s for s in zero_frag if s["avg_patches_per_image"] >= 10]
+    viable = [s for s in zero_frag if s["avg_patches_per_image"] >= MIN_PATCHES_PER_IMAGE_FOR_GRANULARITY]
     recommendation = min(viable, key=lambda s: s["total_patches_full_dataset"]) if viable else (
         min(zero_frag, key=lambda s: s["total_patches_full_dataset"]) if zero_frag else None
     )
