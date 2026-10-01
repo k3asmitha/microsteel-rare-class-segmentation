@@ -1,0 +1,190 @@
+# MicroSteel pipeline config
+# Every script in src/ reads paths and parameters from here.
+# Nothing should be hardcoded in individual scripts that also appears here.
+
+paths:
+  # >>> EDIT THIS PATH before running anything <<<
+  # This must point to wherever YOU extracted microsteel_dataset.zip on
+  # YOUR machine. The path below is specific to the sandbox this project
+  # was built in (/home/claude/...) and will NOT exist on your computer --
+  # it is not a placeholder to leave as-is. On Windows, use forward
+  # slashes or a raw string, e.g. "C:/Users/you/microsteel_dataset" or
+  # "C:\\Users\\you\\microsteel_dataset" (double backslashes).
+  data_root: "./microsteel_dataset"   # contains images_class*/, labels/, splits/
+  evidence_dir: "./evidence"
+  output_dir: "./outputs"
+
+# Rare class under study
+rare_class:
+  id: 2
+  name: "TiN"
+
+# Known per-type class membership, per the project's own dataset description.
+# The codebook audit VERIFIES this against real pixel data rather than assuming it;
+# this entry is what's checked against, not what's blindly trusted.
+expected_type_class_membership:
+  I:   ["Alpha", "TiB2", "TiN", "FeTiB"]
+  II:  ["Alpha", "TiB2", "TiN"]
+  III: ["Alpha", "TiB2", "TiN", "Fe2B"]
+
+# Expected global pixel share per phase, per the project doc / paper.
+# Used ONLY to disambiguate which integer code maps to which phase name when
+# multiple candidate codes share the same per-type presence pattern (e.g.
+# Alpha/TiB2/TiN all appear in all three types, so presence pattern alone
+# can't tell them apart -- percentage rank order can).
+expected_pixel_pct:
+  Alpha: 74.0
+  TiB2: 6.0
+  FeTiB: 9.0
+  Fe2B: 10.0
+  TiN: 0.17
+
+# Expected raw counts per the paper / project doc, used only as a comparison
+# baseline in the audit report -- NOT as ground truth to force-fit data into.
+expected_counts_per_paper:
+  I: 29
+  II: 17
+  III: 36
+  total_labels: 82
+
+# Patch tiling parameters -- DECIDED via measured TiN speck-size analysis,
+# see outputs/AUDIT_REPORT.md section "Patch size decision" for the evidence.
+patching:
+  patch_size: 256
+  stride: 128   # 50% overlap
+
+# Weighted sampler: RESOLVED decision (full derivation + verification in
+# outputs/AUDIT_REPORT.md section 11, produced by src/patching/sampler.py).
+#
+# REJECTED: binary "contains any TiN pixel" oversampling target. With 50%
+# patch overlap, ~51% of train patches already contain at least one TiN
+# pixel with ZERO oversampling -- some from a single overlap-sliver pixel,
+# not real speck content. A target near 0.5 there is a near no-op vs
+# baseline and wouldn't test what the ablation grid claims to test.
+#
+# ADOPTED: sample proportional to each patch's actual TiN PIXEL CONTENT
+# (continuous, not a hard presence/absence cutoff -- a hard pixel-count
+# threshold risks excluding genuinely tiny real specks, since some real
+# specks are only a few pixels in total area). Content is capped at
+# weight_cap_percentile among TiN-containing patches before weighting, so a
+# handful of unusually large patches can't dominate every draw. Target is
+# expressed as the fraction of PIXELS seen per epoch that are TiN (not
+# fraction of patches touched), which is what actually matters for gradient
+# signal.
+#
+# IMPORTANT CEILING, found by grid search over target x cap_percentile:
+# pixel-weighted sampling alone has a hard resolution limit around
+# target=0.004-0.005 (~2.8-3.5x natural) for THIS dataset, because TiN
+# specks are physically tiny -- the single densest patch in the entire
+# train split contains only 1258/65536 (1.9%) TiN pixels, so even sampling
+# ONLY that one patch every draw caps the achievable fraction well below
+# 5%. Targets above ~0.004 either become mathematically infeasible (solver
+# raises ValueError) or push sampling concentration dangerously high (a
+# shrinking set of patches dominating most draws). Do not raise this target
+# without rerunning the grid search in sampler.py's module docstring
+# example -- pushing it up "for more oversampling" will either error out or
+# quietly collapse diversity. This ceiling is also why the loss-weighting
+# cannot carry all the rebalancing work for a class this physically small.
+sampler:
+  mode: "pixel_weighted"          # "pixel_weighted" (adopted) or "presence_binary" (legacy, kept only for the comparison run in sampler.py)
+  target_tin_pixel_multiplier: 2.0  # each type targets 2x its own natural TiN pixel fraction
+  max_tin_pixel_fraction: 0.004     # hard feasibility ceiling; Type II reaches this cap
+  weight_cap_percentile: 90
+  legacy_presence_binary_target: 0.5  # retained only so sampler.py can print the rejected baseline for comparison
+
+# ============================================================================
+# LOSS (class-weighted cross-entropy) -- PLAN CHANGE, documented explicitly
+# ============================================================================
+# The original project document specified Tversky/focal loss for the
+# weighted-loss ablation condition ("implement and tune Tversky/focal loss
+# per type"). The team decided to change this to plain class-weighted
+# cross-entropy instead. This is a deliberate, explicit decision recorded
+# here -- not a silent substitution -- see README's decision log.
+#
+# WEIGHTS ARE COMPUTED PER PROCESSING TYPE, from that type's own train-split
+# pixels only, over only the classes that exist in that type (K = classes
+# present, e.g. 3 for Type II). They are NOT pooled across types: a model
+# trained on Type II must not get weights influenced by Type I/III pixels.
+# (An earlier version pooled all types -- a real bug, fixed and regression-
+# tested in src/loss/verify_class_weights.py.) inverse_sqrt_freq weights:
+#   Type I  : Alpha 0.5906  TiB2 4.4574  TiN 44.1562  FeTiB 0.9612
+#   Type II : Alpha 0.6356  TiB2 1.3924  TiN 10.7524
+#   Type III: Alpha 0.5871  TiB2 2.3693  TiN 11.2758  Fe2B  1.0466
+# The TiN/Alpha ratios quoted below (513.5x, 22.7x, ...) are POOLED, kept only
+# as a rough scale reference. Classes absent from a type get a placeholder
+# weight of 1.0 that never affects the loss (no target pixel has that class).
+#
+# scheme options (all computed from REAL per-pixel train-split counts, see
+# src/loss/class_weights.py -- never hardcode weight values here):
+#   inverse_freq       -- classic "balanced" weighting. Real ratio TiN/Alpha
+#                          = 513.5x. Verified real risk: this large a per-
+#                          pixel weight differential can cause loss spikes;
+#                          watch for instability if using this scheme.
+#   inverse_sqrt_freq   -- gentler. Real ratio = 22.7x. DEFAULT below.
+#   effective_number    -- Cui et al. 2019. Requires beta tuned to this
+#                          dataset's per-pixel scale (millions), NOT the
+#                          paper's typical 0.99-0.9999 -- those underflow to
+#                          uniform weights here (verified, see
+#                          class_weights.py docstring). beta=0.999999 gives
+#                          an 11.3x ratio, beta=0.99999999 gives ~394x.
+loss:
+  scheme: "inverse_sqrt_freq"
+  effective_number_beta: 0.999999  # only used if scheme == "effective_number"
+
+# ============================================================================
+# TRAINING :Training automatically uses CUDA when available and otherwise falls back to CPU.
+# ============================================================================
+training:
+  batch_size: 4          # must be >=2 -- BatchNorm (used by both architectures)
+                           # requires more than 1 sample per channel in train mode;
+                           # DataLoader uses drop_last=True specifically so a
+                           # leftover batch of size 1 never reaches the model
+  learning_rate: 0.0001
+  epochs: 30               # real budget -- expect this to take a while on CPU;
+                           # early stopping will likely end it sooner
+  smoke_test_epochs: 2     # used by train.py --smoke-test: just enough to
+                           # mechanically prove the whole path works end to end
+  early_stopping_patience: 8   # epochs without val_loss improvement before stopping
+  lr_patience: 3               # epochs without val_loss improvement before halving LR
+  augment: true
+  seed: 0
+  deeplab_encoder_weights: "imagenet"   # real training default -- needs internet
+                                         # on first run to download EfficientNet-b0
+                                         # ImageNet weights. verify_models.py
+                                         # overrides this to None internally, since
+                                         # this sandbox cannot reach pretrained-
+                                         # weight hosts -- use "imagenet" on your
+                                         # own machine for real training.
+  attention_unet_base_ch: 16   # CPU-size default (32-64 is more common in
+                                # papers but roughly triples CPU compute for no
+                                # verified accuracy benefit on a dataset this small)
+
+# ============================================================================
+# EXPERIMENT GRID -- Person A's 8 owned runs (Type II, both architectures,
+# all 4 configs). Not machine-readable config for a runner (deliberately --
+# each run should be launched and checked individually per the "get one
+# fully working before launching the rest" guidance), just the documented
+# checklist this project maps to.
+# ============================================================================
+experiment_grid_type_ii:
+  - {run_id: "II-DL-B",   architecture: "DeepLabV3Plus", configuration: "baseline"}
+  - {run_id: "II-DL-P",   architecture: "DeepLabV3Plus", configuration: "patch"}
+  - {run_id: "II-DL-L",   architecture: "DeepLabV3Plus", configuration: "loss"}
+  - {run_id: "II-DL-PL",  architecture: "DeepLabV3Plus", configuration: "both"}
+  - {run_id: "II-AUN-B",  architecture: "AttentionUNet", configuration: "baseline"}
+  - {run_id: "II-AUN-P",  architecture: "AttentionUNet", configuration: "patch"}
+  - {run_id: "II-AUN-L",  architecture: "AttentionUNet", configuration: "loss"}
+  - {run_id: "II-AUN-PL", architecture: "AttentionUNet", configuration: "both"}
+
+# Candidate configs the speck-size analysis will benchmark before the
+# patch_size/stride above is treated as final. Selection requires 0%
+# fragmentation AND >=20 avg patches/image (an engineering judgment call,
+# not derived from data -- see tin_speck_analysis.py comment), then picks
+# the cheapest (fewest total patches) among what's left.
+patching_candidates:
+  - [128, 128]
+  - [128, 64]
+  - [256, 256]
+  - [256, 128]
+  - [512, 512]
+  - [512, 256]

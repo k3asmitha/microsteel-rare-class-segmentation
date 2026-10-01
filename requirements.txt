@@ -1,0 +1,10 @@
+numpy>=1.24
+Pillow>=10.0
+scipy>=1.10
+scikit-image>=0.21
+PyYAML>=6.0
+
+# Training/inference. Colab already provides a CUDA-enabled PyTorch build when a GPU runtime is selected.
+# For local CPU-only environments, install an appropriate CPU PyTorch build if needed.
+torch>=2.0
+segmentation-models-pytorch>=0.5

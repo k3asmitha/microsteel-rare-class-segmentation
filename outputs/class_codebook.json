@@ -1,0 +1,73 @@
+{
+  "class_id_to_name": {
+    "4": "Fe2B",
+    "3": "FeTiB",
+    "0": "Alpha",
+    "1": "TiB2",
+    "2": "TiN"
+  },
+  "rare_class_id": 2,
+  "rare_class_name": "TiN",
+  "type_class_membership": {
+    "I": [
+      "Alpha",
+      "TiB2",
+      "TiN",
+      "FeTiB"
+    ],
+    "II": [
+      "Alpha",
+      "TiB2",
+      "TiN"
+    ],
+    "III": [
+      "Alpha",
+      "TiB2",
+      "TiN",
+      "Fe2B"
+    ]
+  },
+  "decode_evidence": {
+    "4": {
+      "presence_signature": [
+        "III"
+      ],
+      "global_pct": 10.5443,
+      "matched_by": "unique presence signature"
+    },
+    "3": {
+      "presence_signature": [
+        "I"
+      ],
+      "global_pct": 9.5738,
+      "matched_by": "unique presence signature"
+    },
+    "0": {
+      "presence_signature": [
+        "I",
+        "II",
+        "III"
+      ],
+      "global_pct": 73.9643,
+      "matched_by": "closest pixel-pct match among ambiguous candidates ['Alpha', 'TiB2', 'TiN'] (expected Alpha=74.0%, observed 73.9643%)"
+    },
+    "1": {
+      "presence_signature": [
+        "I",
+        "II",
+        "III"
+      ],
+      "global_pct": 5.746,
+      "matched_by": "closest pixel-pct match among ambiguous candidates ['TiB2', 'TiN'] (expected TiB2=6.0%, observed 5.7460%)"
+    },
+    "2": {
+      "presence_signature": [
+        "I",
+        "II",
+        "III"
+      ],
+      "global_pct": 0.1716,
+      "matched_by": "unique presence signature"
+    }
+  }
+}
